@@ -1,15 +1,18 @@
+import argparse
 import ptvsd
 import process_data
 import train_classifier
 
-
 def _init_parser():
-    parent_parser = argparse.ArgumentParser(description='process_data.py', fromfile_prefix_chars='@')
+    """
+    inits the argument parser for supporting command line invocation
+    """
+    parent_parser = argparse.ArgumentParser(description='Disaster Response Model CLI', fromfile_prefix_chars='@')
 
     parent_parser.add_argument ('-d', '--debug', dest='debug', action='store_true', 
                                     help='activate debugging. attaches a debuggger on localhost and port 5679')
 
-    parser_tasks = parent_parser.add_subparsers(prog='process_data.py', 
+    parser_tasks = parent_parser.add_subparsers(prog='main.py', 
                                             title='tasks', 
                                             dest='actionCmd')
 
@@ -79,5 +82,5 @@ if __name__ =='__main__':
 
     if args.actionCmd == 'etl-pipeline':
         process_data.run_etl_pipeline(args.messages_filename, args.categories_filename, args.dbname, args.print_report)
-    elif args.actionCmd == 'ml-pipeline':     
+    elif args.actionCmd == 'ml-pipeline':
         train_classifier.main(args.dbname, args.tablename, args.model_filename)

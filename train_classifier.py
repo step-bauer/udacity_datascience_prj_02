@@ -1,3 +1,10 @@
+"""
+This module provides functionality to train the Disaster Response message classifier absed on the 
+data the ETL process has stored in the Disaster Response database.
+
+This module can also be executed as script from command line or be invoked via the 
+main.py command line argument script which provies some help how to call it.
+"""
 import logging
 import re
 import sys
@@ -200,7 +207,7 @@ class DisasterResponseModel ():
 
 
     #sklearn.pipeline.Pipeline
-    def build_pipeline (self, starting_verb:bool=False)->Pipeline: 
+    def build_pipeline (self, starting_verb:bool=False)->Pipeline:
         """builds a sklearn.pipeline Pipeline
 
         Parameter
@@ -293,7 +300,7 @@ class DisasterResponseModel ():
     @classmethod
     def load_model (cls, filename:str):
         """
-        loads a model from a pickle file 
+        loads a model from a pickle file
 
         Parameters
         ----------
@@ -306,7 +313,7 @@ class DisasterResponseModel ():
         return disaster_response_model
 
 
-def main (db_filename:str, table_name:str, filename):
+def main (db_filename:str, table_name:str, model_out_filename:str):
     """
     Parameters
     ----------
@@ -320,13 +327,15 @@ def main (db_filename:str, table_name:str, filename):
     disaster_response_model.load_data (db_filename, table_name)
 
     disaster_response_model.build_model(False)
-    disaster_response_model.save_model(filename)
+    disaster_response_model.save_model(model_out_filename)
     disaster_response_model.display_test_results()
     
     
 
 # main method for invoking via command line
+# use main.py instead of this script to get help how to invoke it
 if __name__ =='__main__':
-    main(sys.argv[0], sys.argv[1])
+    # db_filename:str, table_name:str, model_out_filename:str
+    main(sys.argv[0], sys.argv[1], sys.argv[2])
     
     

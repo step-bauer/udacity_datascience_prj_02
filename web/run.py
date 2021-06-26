@@ -13,6 +13,18 @@ from plotly.graph_objs import Bar
 import joblib 
 from sqlalchemy import create_engine
 
+from sklearn import metrics
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.model_selection import GridSearchCV
+import sklearn.ensemble.forest
+
+#from  train_classifier import DisasterResponseModel
+
 logging.basicConfig(level=logging.DEBUG,
                    #filename='basic_config_test1.log',
                    format='%(asctime)s %(name)s %(levelname)s:%(message)s')
@@ -38,6 +50,8 @@ engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('DisasterMessages', engine)
 
 # load model
+#model = DisasterResponseModel()
+#model = model.load_model("../models/disaster_response_model.joblib")
 model = joblib.load("../models/disaster_response_model.joblib")
 
 
