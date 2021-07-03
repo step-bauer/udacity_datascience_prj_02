@@ -19,6 +19,12 @@ conda config --add channels conda-forge
 
 conda install ptvsd pandas scipy scikit-learn matplotlib sqlalchemy joblib nltk flask plotly
 ```
+
+for windows an alternative method is to use the conda-env-spec.txt
+```
+conda create -n py39_dresp --file conda-env-spec.txt
+```
+
 #### 3. install requirements
 
 ## 2nd Project for Udacity Datascience Nanadegree
