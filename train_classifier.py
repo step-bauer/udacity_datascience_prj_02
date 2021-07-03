@@ -105,10 +105,12 @@ class DisasterResponseModel ():
         self.pipeline = self.build_pipeline()
         
         self.grid_parameters = {
+                                'tfidf_vect__tokenizer': (DisasterResponseModel.tokenize_lem,
+                                                          DisasterResponseModel.tokenize),
                                 'tfidf_vect__ngram_range': ((1, 1), (1, 2)),
-                                'tfidf_vect__max_df': (0.55, 0.75, 0.9),
-                                'tfidf_vect__max_features': (None, 5000, 10000),
-                                'clf__estimator__n_estimators' : (90,150)
+                                'tfidf_vect__max_df': (0.50, 0.9),
+                                'tfidf_vect__max_features': (4000, 15000),
+                                #'clf__estimator__n_estimators' : (90,150)
                                 #'tfidf_vect__tfidf__use_idf': (True, False),
                                 #'tfidf_vect__stop_words': (None, stopwords.words('english'))
                             }
@@ -175,6 +177,10 @@ class DisasterResponseModel ():
         return X, Y
 
     @classmethod
+    def tokenize_lem(cls, text:str)->list:
+        return cls.tokenize(text, True)
+
+    @classmethod
     def tokenize(cls, text:str, enable_lemmatizer:bool=False)->list:
         """
         this tokenizer method splits text in word tokens. 
@@ -221,7 +227,7 @@ class DisasterResponseModel ():
                 ('tfidf_vect', TfidfVectorizer(tokenizer=self.tokenize)),
                 ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=-1)))
             ])
-        else:    
+        else:
             self.pipeline = Pipeline([
                 ('features', FeatureUnion([
                     ('tfidf_vect', TfidfVectorizer(tokenizer=self.tokenize)),
