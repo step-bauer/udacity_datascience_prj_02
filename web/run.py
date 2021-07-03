@@ -21,18 +21,21 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.model_selection import GridSearchCV
-import sklearn.ensemble.forest
+#import sklearn.ensemble.forest
 
-#from  train_classifier import DisasterResponseModel
+from train_classifier import DisasterResponseModel    
 
 logging.basicConfig(level=logging.DEBUG,
                    #filename='basic_config_test1.log',
                    format='%(asctime)s %(name)s %(levelname)s:%(message)s')
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 app = Flask(__name__)
+model = None
+df = None
 
 def tokenize(text):
     tokens = word_tokenize(text)
@@ -45,34 +48,42 @@ def tokenize(text):
 
     return clean_tokens
 
-# load data
-engine = create_engine('sqlite:///../data/DisasterResponse.db')
-df = pd.read_sql_table('DisasterMessages', engine)
+def load_data():    
+    # load data
+    engine = create_engine('sqlite:///data/DisasterResponse.db')
+    df = pd.read_sql_table('DisasterMessages', engine)
 
-# load model
-#model = DisasterResponseModel()
-#model = model.load_model("../models/disaster_response_model.joblib")
-model = joblib.load("../models/disaster_response_model.joblib")
+    # load model
+    model = DisasterResponseModel()
+    model = model.load_model("./models/disaster_response_model_sverb.joblib")    
+    #model = joblib.load("../models/disaster_response_model.joblib")
+
+    return model, df
 
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
-    
+    logger.info('route index')
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    ser_cat_sums = df.select_dtypes(exclude='object').sum()
+    ser_cat_sums.drop('id', inplace =True   )
+    cateogry_labels = ser_cat_sums.index.values
+    
+    logger.info(f'genre_name: {len(genre_names)}')
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
                 Bar(
-                    x=genre_names,
-                    y=genre_counts
+                    x=cateogry_labels,
+                    y=ser_cat_sums
                 )
             ],
 
@@ -85,6 +96,24 @@ def index():
                     'title': "Genre"
                 }
             }
+        },
+        {
+            'data': [
+                Bar(
+                    x=genre_names,
+                    y=genre_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution Message Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category"
+                }
+            }
         }
     ]
     
@@ -92,6 +121,7 @@ def index():
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
     
+    logger.info(f'ids: {ids}')
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
 
@@ -115,7 +145,11 @@ def go():
 
 
 def main():
-    app.run(host='0.0.0.0', port=3001, debug=True)
+    global model 
+    global df
+    model, df = load_data()
+
+    app.run(host='0.0.0.0', port=3002, debug=True)
 
 
 if __name__ == '__main__':

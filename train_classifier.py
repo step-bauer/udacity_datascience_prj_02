@@ -7,6 +7,7 @@ main.py command line argument script which provies some help how to call it.
 """
 import logging
 import re
+import os
 import sys
 
 from joblib import dump, load
@@ -18,7 +19,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.model_selection import GridSearchCV
 
@@ -26,14 +27,13 @@ import nltk
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
-nltk.download(['punkt','stopwords','wordnet','averaged_perceptron_tagger'])
-
-
-logging.basicConfig(level=logging.DEBUG,
-                   #filename='basic_config_test1.log',
+log_level = os.getenv('LOGLEVEL', logging.ERROR)
+logging.basicConfig(level=log_level,
                    format='%(asctime)s %(name)s %(levelname)s:%(message)s')
 
 logger = logging.getLogger(__name__)
+
+nltk.download(['punkt','stopwords','wordnet','averaged_perceptron_tagger'], quiet=True)
 
 class StartingVerbExtractor(BaseEstimator, TransformerMixin):
     ''' Determines if first word
@@ -106,8 +106,9 @@ class DisasterResponseModel ():
         
         self.grid_parameters = {
                                 'tfidf_vect__ngram_range': ((1, 1), (1, 2)),
-                                'tfidf_vect__max_df': (0.5, 0.75, 1.0),
+                                'tfidf_vect__max_df': (0.55, 0.75, 0.9),
                                 'tfidf_vect__max_features': (None, 5000, 10000),
+                                'clf__estimator__n_estimators' : (90,150)
                                 #'tfidf_vect__tfidf__use_idf': (True, False),
                                 #'tfidf_vect__stop_words': (None, stopwords.words('english'))
                             }
@@ -218,20 +219,16 @@ class DisasterResponseModel ():
         if not starting_verb:
             self.pipeline = Pipeline([                
                 ('tfidf_vect', TfidfVectorizer(tokenizer=self.tokenize)),
-                ('clf', MultiOutputClassifier(RandomForestClassifier()))
+                ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=-1)))
             ])
         else:    
             self.pipeline = Pipeline([
                 ('features', FeatureUnion([
-                    ('text_pipeline', Pipeline([
-                        ('vect', CountVectorizer(tokenizer=self.tokenize)),
-                        ('tfidf', TfidfTransformer())
-                    ])),
-
+                    ('tfidf_vect', TfidfVectorizer(tokenizer=self.tokenize)),
                     ('starting_verb', StartingVerbExtractor())
                 ])),
 
-                ('clf', MultiOutputClassifier(RandomForestClassifier()))
+                ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=-1)))
             ])
 
         return self.pipeline
@@ -260,9 +257,10 @@ class DisasterResponseModel ():
         Returns
         -------
 
-            metrics.classification_report : sklearn classification report 
+            metrics.classification_report : sklearn classification report
         """                
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.Y, test_size=0.01, train_size=0.01)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.Y, 
+                                                                                test_size=0.3)
         logger.debug('split data set into %s train records and %s test records', self.X_train.shape[0], self.X_test.shape[0])
         
         if not is_grid_search:
@@ -273,7 +271,10 @@ class DisasterResponseModel ():
             logger.debug('execute prediction for X_test data set')
             self.y_pred = self.pipeline.predict(self.X_test)
         elif is_grid_search:            
-            self.model = GridSearchCV(self.pipeline, param_grid = self.grid_parameters)            
+            self.model = GridSearchCV(self.pipeline, 
+                                    param_grid = self.grid_parameters, 
+                                    cv=7,                                    
+                                    verbose=4)            
 
             logger.debug('fit GridSearch on train data set')
             self.model.fit(self.X_train, self.y_train)
@@ -293,9 +294,15 @@ class DisasterResponseModel ():
                     name of the file the model is saved to
         """
         # uses dump from joblib
-        dump(self, filename)
-        dump(self.model, f'model_{filename}')        
-        logger.debug('model saved to file %s', filename)
+        path = filename.split("/")[:-1]
+        if len(path)>0:
+            path = "/".join(path) + "/"        
+        cls_filename = f'{path}class_{filename.split("/")[-1]}'
+        model_filename = f'{path}model_{filename.split("/")[-1]}'
+        dump(self, cls_filename)
+        dump(self.model, model_filename)        
+        logger.debug('class saved to file %s', cls_filename)
+        logger.debug('model saved to file %s', model_filename)
 
     @classmethod
     def load_model (cls, filename:str):
@@ -326,7 +333,7 @@ def main (db_filename:str, table_name:str, model_out_filename:str):
     disaster_response_model  = DisasterResponseModel()
     disaster_response_model.load_data (db_filename, table_name)
 
-    disaster_response_model.build_model(False)
+    disaster_response_model.build_model(True)
     disaster_response_model.save_model(model_out_filename)
     disaster_response_model.display_test_results()
     

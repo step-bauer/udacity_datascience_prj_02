@@ -2,19 +2,21 @@ import argparse
 import ptvsd
 import process_data
 import train_classifier
+from  web.run import main as webmain
 
 def _init_parser():
     """
     inits the argument parser for supporting command line invocation
     """
-    parent_parser = argparse.ArgumentParser(description='Disaster Response Model CLI', fromfile_prefix_chars='@')
+    parent_parser = argparse.ArgumentParser(description='Disaster Response Model CLI',
+                                            fromfile_prefix_chars='@')
 
     parent_parser.add_argument ('-d', '--debug', dest='debug', action='store_true', 
-                                    help='activate debugging. attaches a debuggger on localhost and port 5679')
+                                help='activate debugging. attaches a debuggger on localhost and port 5679')
 
-    parser_tasks = parent_parser.add_subparsers(prog='main.py', 
-                                            title='tasks', 
-                                            dest='actionCmd')
+    parser_tasks = parent_parser.add_subparsers(prog='main.py',
+                                                title='tasks',
+                                                dest='actionCmd')
 
     parser_etl_pipeline = parser_tasks.add_parser('etl-pipeline', #parents=[parent_parser],
                                                 add_help=False, description='execute ETL Pipeline process')
@@ -34,7 +36,7 @@ def _init_parser():
                         dest='dbname',
                         help='name of the database with path. e.g. ./data/results.db')
 
-    parser_etl_pipeline.add_argument('-p', '--print-report',                         
+    parser_etl_pipeline.add_argument('-p', '--print-report',
                         dest='print_report',
                         action='store_true',
                         help='print ETL process report')
@@ -48,23 +50,32 @@ def _init_parser():
     
     parser_ml_pipeline.add_argument('-mf', '--model-filename', required=True,
                         metavar=' MODLE_FILENAME',
-                        dest='model_filename',
+                        dest='model_filename', 
                         help='fullpath of the file that the ML model is stored in')
 
     parser_ml_pipeline.add_argument('-db', '--database-name', required=True,
                         metavar='DBNAME',
                         dest='dbname',
+                        default='./data/DisasterResponse.db',
                         help='name of the database with path. e.g. ./data/DisasterResponse.db')
 
     parser_ml_pipeline.add_argument('-tbl', '--tablename', required=True,
                         metavar='TBLNAME',
                         dest='tablename',
+                        default='DisasterMessages',
                         help='name of the table the input data is stored at, e.g. DisasterMessages')
 
     parser_ml_pipeline.add_argument('-p', '--print-report',                         
                         dest='print_report',
                         action='store_true',
                         help='print ML process report')                        
+
+    ###################################################################################################
+    #
+    #  run web app
+    #
+    parser_ml_pipeline = parser_tasks.add_parser('run-web-app', #parents=[parent_parser],
+                                                add_help=False, description='execute web app')
 
     return parent_parser
                             
@@ -84,3 +95,5 @@ if __name__ =='__main__':
         process_data.run_etl_pipeline(args.messages_filename, args.categories_filename, args.dbname, args.print_report)
     elif args.actionCmd == 'ml-pipeline':
         train_classifier.main(args.dbname, args.tablename, args.model_filename)
+    elif args.actionCmd == 'run-web-app':
+        webmain()

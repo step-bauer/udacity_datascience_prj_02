@@ -1,4 +1,4 @@
-""" The process_data module contains the code for the ETL Pipeline of the 
+""" The process_data module contains the code for the ETL Pipeline of the
     Disaster Response Project.
 
     Main tasks are to
@@ -15,15 +15,16 @@ import sys
 
 import pandas as pd
 import sqlalchemy as sql
+import os
 
-
-logging.basicConfig(level=logging.ERROR,                   
+log_level = os.getenv('LOGLEVEL', logging.ERROR)
+logging.basicConfig(level=log_level,
                    format='%(asctime)s %(name)s %(levelname)s:%(message)s')
 
 logger = logging.getLogger(__name__)
 
 class ETLPipeline ():
-    """ETLPipeline class provides methods to control the ETL process. 
+    """ETLPipeline class provides methods to control the ETL process.
     """
 
     def __init__(self, messages_filename:str, categories_filename:str, dbname : str):
@@ -100,7 +101,7 @@ class ETLPipeline ():
   
         # the next line removes all alpha caracters and just keeps 0, 1 and ;
         # after splitting by ";" we have the one-hot encoding for the categories
-        categories_sep = self.df_merged['categories'].str.replace('[^01;]','').str.split(';',expand=True)
+        categories_sep = self.df_merged['categories'].str.replace('[^01;]','', regex=True).str.split(';',expand=True)
         categories_sep.columns = category_headers
 
         # add id column
@@ -168,11 +169,13 @@ class ETLPipeline ():
         """
         db_name = f'sqlite:///{self.dbname}'
         engine = sql.create_engine(db_name)
-        self.df_merged.to_sql('DisasterMessages', engine, index=False, if_exists='replace')
-        logger.info(f'Data has been written to sqllite DB: {self.dbname}')
+        tbl_name = 'DisasterMessages'
+        self.df_merged.to_sql(tbl_name, engine, index=False, if_exists='replace')
 
+        msg = f'stored merged dataframe in sqlite DB: {self.dbname} - Tablename: {tbl_name}'
+        logger.info(msg)
         self.process_report.append({'stepname' : "store_data",
-                                   'messages' :  [ f'stored merged dataframe in sqlite DB: {self.dbname}']})
+                                    'messages' :  [msg] })
 
 
     def print_report(self):
@@ -184,8 +187,8 @@ class ETLPipeline ():
         for step in self.process_report:
             print(step['stepname'])
 
-            for m in step['messages']:
-                print(m)
+            for msg in step['messages']:
+                print(msg)
 
             print('-'*30)
             print()

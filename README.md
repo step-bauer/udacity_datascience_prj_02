@@ -1,5 +1,26 @@
 # Disaster Response Project
 
+
+## Installation
+
+### Window Installation
+#### 1. clone git repository
+``` 
+git clone https://github.com/step-bauer/udacity_datascience_prj_02.git
+```
+
+#### 2. create new virtual environment
+```
+conda -create -n <env_name> python=3.9
+
+conda activate <env_name>
+
+conda config --add channels conda-forge
+
+conda install ptvsd pandas scipy scikit-learn matplotlib sqlalchemy joblib nltk flask plotly
+```
+#### 3. install requirements
+
 ## 2nd Project for Udacity Datascience Nanadegree
 This Repo contains the code for the "Disaster REsponse Project" which is the second prject of the Udacity Datascience Nanodegree.
 
@@ -20,3 +41,5 @@ The code is stored in process_data.py
 
 
 ### Flask Web App
+
+
