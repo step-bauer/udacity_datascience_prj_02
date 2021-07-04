@@ -109,8 +109,8 @@ class DisasterResponseModel ():
                                                           DisasterResponseModel.tokenize),
                                 'tfidf_vect__ngram_range': ((1, 1), (1, 2)),
                                 'tfidf_vect__max_df': (0.50, 0.9),
-                                'tfidf_vect__max_features': (4000, 15000),
-                                #'clf__estimator__n_estimators' : (90,150)
+                                'tfidf_vect__max_features': (3000,5000, 10000),
+                                'clf__estimator__n_estimators' : (70,250)
                                 #'tfidf_vect__tfidf__use_idf': (True, False),
                                 #'tfidf_vect__stop_words': (None, stopwords.words('english'))
                             }
@@ -303,11 +303,9 @@ class DisasterResponseModel ():
         path = filename.split("/")[:-1]
         if len(path)>0:
             path = "/".join(path) + "/"        
-        cls_filename = f'{path}class_{filename.split("/")[-1]}'
+        
         model_filename = f'{path}model_{filename.split("/")[-1]}'
-        dump(self, cls_filename)
         dump(self.model, model_filename)        
-        logger.debug('class saved to file %s', cls_filename)
         logger.debug('model saved to file %s', model_filename)
 
     @classmethod
@@ -348,7 +346,7 @@ def main (db_filename:str, table_name:str, model_out_filename:str):
 # main method for invoking via command line
 # use main.py instead of this script to get help how to invoke it
 if __name__ =='__main__':
-    # db_filename:str, table_name:str, model_out_filename:str
-    main(sys.argv[0], sys.argv[1], sys.argv[2])
+    # db_filename:str, model_out_filename:str
+    main(sys.argv[0], 'DisasterMessages', sys.argv[1])
     
     
