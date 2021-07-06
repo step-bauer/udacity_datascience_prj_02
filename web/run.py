@@ -23,7 +23,7 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.model_selection import GridSearchCV
 #import sklearn.ensemble.forest
 
-from train_classifier import DisasterResponseModel    
+from models.train_classifier import DisasterResponseModel    
 
 logging.basicConfig(level=logging.DEBUG,
                    #filename='basic_config_test1.log',

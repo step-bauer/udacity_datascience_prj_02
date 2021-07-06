@@ -177,6 +177,11 @@ class DisasterResponseModel ():
         return X, Y
 
     @classmethod
+    def evaluate_data(cls, y_test, y_pred):
+        for i,col in enumerate(y_test.columns):
+            print(f'{col}: {metrics.accuracy_score(y_test.values[:,i], y_pred[:,i])}')
+
+    @classmethod
     def tokenize_lem(cls, text:str)->list:
         return cls.tokenize(text, True)
 

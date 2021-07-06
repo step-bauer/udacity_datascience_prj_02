@@ -1,7 +1,7 @@
 import argparse
 import ptvsd
-import process_data
-import train_classifier
+import data.process_data
+import models.train_classifier
 from  web.run import main as webmain
 
 def _init_parser():
@@ -69,6 +69,7 @@ def _init_parser():
                         dest='print_report',
                         action='store_true',
                         help='print ML process report')                        
+
 
     ###################################################################################################
     #
