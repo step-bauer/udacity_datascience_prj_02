@@ -9,7 +9,7 @@
 3. [Project Details](#project-details)
     1. [Project structure](#project-structure)
     2. [ETL Pipeline](#etl-pipeline)
-    3. [ML Pipeline - Training of the Classifier](#ml-pipeline)        
+    3. [Train Classifier - Training of the Classifier](#train-classifier)        
 4. [License](#license)
 5. [Acknowledgement](#acknowledgement)
 6. [Screenshots](#screenshots)
@@ -73,6 +73,11 @@ or as an alternative call ./models/train_classifier
 python ./models/train_classifier.py ./data/DisasterMsg.db ./models/classifier_model.joblib
 ```
 
+#### Web App
+```
+python main.py run-web-app
+```
+
 ## Project Details
 
 ### Project structure
@@ -104,15 +109,17 @@ to get help for the command line tool
 ### ETL Pipeline
 The ETL pipeline will
 
-* Loads the messages and categories datasets
-* Merges the two datasets
-* Cleans the data
-* Stores it in a SQLite database
+* Load the messages and categories datasets
+* Merge the two datasets
+* Clean the data
+* Store it in a SQLite database
 
-The code is stored in process_data.py
+The code is stored in ./data/process_data.py
 
-### ML Pipeline
-The train_classifier.py uses ML Pipeline and a GridSearch to determine the best classifier. The pipeline uses sckit-learn [TfidfVectorizer](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction) to convert a collection of raw documents to a matrix of TF-IDF features and then as an classifier for multi target classification [MultiOutputClassifier(RandomForestClassifier)](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html). 
+### Train Classifier
+The purpose of the train classifier part is to train a ML model to predict for a given messages the categroies it is related to.
+
+The train_classifier.py uses Train Classifier and a GridSearch to determine the best classifier. The pipeline uses sckit-learn [TfidfVectorizer](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction) to convert a collection of raw documents to a matrix of TF-IDF features and then as an classifier for multi target classification [MultiOutputClassifier(RandomForestClassifier)](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html). 
 In order to find the best hyperparameters for the estimator I used [GridSearchSV](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html) for a search over the following parameters
 
 
