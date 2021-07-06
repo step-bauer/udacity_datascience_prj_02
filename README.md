@@ -36,14 +36,25 @@ git clone https://github.com/step-bauer/udacity_datascience_prj_02.git
 
 #### 2. create new virtual environment
 ```
-conda -create -n <env_name> python=3.9
+conda create -n <env_name> python=3.9
+```
 
+**Note**: It is maybe required to run 
+```
+conda init bash
+```
+to initialize the bash. 
+
+Activate now the new environment and install the required packages
+```
 conda activate <env_name>
 
 conda config --add channels conda-forge
 
-conda install ptvsd pandas scipy scikit-learn matplotlib sqlalchemy joblib nltk flask plotly
+conda install ptvsd=4.3.2 pandas=1.3.0 scipy=1.7.0 scikit-learn=0.24.2 matplotlib=3.4.2 sqlalchemy=1.4.20 joblib=1.0.1 nltk=3.6.2 flask=2.0.1 plotly=5.1.0
 ```
+
+
 
 for windows an alternative method is to use the conda-env-spec.txt
 ```

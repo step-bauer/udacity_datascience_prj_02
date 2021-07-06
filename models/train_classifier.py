@@ -9,6 +9,7 @@ import logging
 import re
 import os
 import sys
+import ptvsd
 
 from joblib import dump, load
 import pandas as pd
@@ -350,8 +351,8 @@ def main (db_filename:str, table_name:str, model_out_filename:str):
 
 # main method for invoking via command line
 # use main.py instead of this script to get help how to invoke it
-if __name__ =='__main__':
+if __name__ =='__main__':    
     # db_filename:str, model_out_filename:str
-    main(sys.argv[0], 'DisasterMessages', sys.argv[1])
+    main(sys.argv[1], 'DisasterMessages', sys.argv[2])
     
     

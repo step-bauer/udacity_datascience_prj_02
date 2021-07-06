@@ -12,6 +12,7 @@ from __future__ import absolute_import
 
 import logging
 import sys
+import ptvsd
 
 import pandas as pd
 import sqlalchemy as sql
@@ -301,7 +302,7 @@ def run_etl_pipeline (messages_filename:str, categories_filename:str, dbname:str
 # main method for invoking via command line
 if __name__ =='__main__':
     # messages_filename:str, categories_filename:str, dbname:str
-    run_etl_pipeline(sys.argv[0], sys.argv[1], sys.argv[2])
+    run_etl_pipeline(sys.argv[1], sys.argv[2], sys.argv[3])
 
     
     
