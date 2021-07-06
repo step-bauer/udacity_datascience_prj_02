@@ -78,6 +78,8 @@ python ./models/train_classifier.py ./data/DisasterMsg.db ./models/classifier_mo
 python main.py run-web-app
 ```
 
+The web-app runs on **localhost port 3002**
+
 ## Project Details
 
 ### Project structure
