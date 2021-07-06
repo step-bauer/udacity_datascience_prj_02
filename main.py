@@ -1,6 +1,6 @@
 import argparse
 import ptvsd
-import data.process_data
+import data.process_data 
 import models.train_classifier
 from  web.run import main as webmain
 
@@ -93,8 +93,8 @@ if __name__ =='__main__':
         ptvsd.wait_for_attach()
 
     if args.actionCmd == 'etl-pipeline':
-        process_data.run_etl_pipeline(args.messages_filename, args.categories_filename, args.dbname, args.print_report)
+        data.process_data.run_etl_pipeline(args.messages_filename, args.categories_filename, args.dbname, args.print_report)
     elif args.actionCmd == 'ml-pipeline':
-        train_classifier.main(args.dbname, args.tablename, args.model_filename)
+        models.train_classifier.main(args.dbname, args.tablename, args.model_filename)
     elif args.actionCmd == 'run-web-app':
         webmain()
