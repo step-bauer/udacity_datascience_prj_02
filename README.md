@@ -62,7 +62,7 @@ python main.py etl-pipeline -mf ./data/disaster_messages.csv -cf ./data/disaster
 you can also call the ./data/process_pipline.py script directly and provide the three parameters (messages_filename:str, categories_filename:str, dbname:str)
 
 #### 3.2 ML - Train Classifier
-**Info** the train_classifier script can run very long on machines with a low number of CPUs. The script ran on a machine with 16 CPU for more than 2 hours.
+**Info** the train_classifier script can run very long on machines with a low number of CPUs. The script ran on a machine with 16 CPU for more than 2.5 hours.
 
 ```
 python main.py ml-pipeline -mf ./models/classifier_model.joblib -db ./data/DisasterMsg.db -tbl DisasterMessages
