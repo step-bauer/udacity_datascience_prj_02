@@ -305,12 +305,8 @@ class DisasterResponseModel ():
                 filename : str
                     name of the file the model is saved to
         """
-        # uses dump from joblib
-        path = filename.split("/")[:-1]
-        if len(path)>0:
-            path = "/".join(path) + "/"        
-        
-        model_filename = f'{path}model_{filename.split("/")[-1]}'
+        # uses dump from joblib        
+        model_filename = filename
         dump(self.model, model_filename)        
         logger.debug('model saved to file %s', model_filename)
 
