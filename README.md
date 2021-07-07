@@ -17,7 +17,8 @@
 ## Overview
 This Repo contains the code for the "Disaster Response Project" which is the second prject of the Udacity Datascience Nanodegree.
 
-It implements a message classification app that assigns a message to categories based on the message content (Word of bags).
+It implements a message classification app that assigns a message to categories based on the message content (Word of bags). Using the web app an you can input a new message and get a classification showing the which categories the message is related to so you get an idea what kind of action is needed.
+
 The Project consists of the 3 parts:
 
 * ETL Pipeline - Data cleaning and preparation
