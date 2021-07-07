@@ -62,12 +62,12 @@ conda create -n py39_dresp --file conda-env-spec.txt
 ```
 
 ### Execution
-change to main directory of the repository
+change to main directory of the repository. Execute the main.py with the apprpriate parameters. use main.py -h for help.
 
 #### 3.1 ETL Pipeline
-
+run the ETL Pipeline e.g.
 ```
-python main.py etl-pipeline -mf ./data/disaster_messages.csv -cf ./data/disaster_categories.csv -db ./data/DisasterMsg.db
+python main.py etl-pipeline -mf ./data/disaster_messages.csv -cf ./data/disaster_categories.csv -db ./data/DisasterMsg.db -tbl DisasterMessages
 ```
 
 you can also call the ./data/process_pipline.py script directly and provide the three parameters (messages_filename:str, categories_filename:str, dbname:str)
@@ -80,16 +80,19 @@ python main.py ml-pipeline -mf ./models/classifier_model.joblib -db ./data/Disas
 ```
 
 or as an alternative call ./models/train_classifier
+
+**Note**: if you use this instead of the main.py then ensure that you used DisasterMessages as tablename
 ```
 python ./models/train_classifier.py ./data/DisasterMsg.db ./models/classifier_model.joblib
 ```
 
 #### Web App
+start the web application
 ```
-python main.py run-web-app
+python main.py run-web-app -db ./data/DisasterMsg.db -tbl DisasterMessages -mf ./models/classifier_model.joblib -p 3002
 ```
 
-The web-app runs on **localhost port 3002**
+The web-app runs on **localhost port 3002** (or the port you specified with the -p parameter)
 
 ## Project Details
 
