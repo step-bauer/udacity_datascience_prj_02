@@ -28,7 +28,7 @@ class ETLPipeline ():
     """ETLPipeline class provides methods to control the ETL process.
     """
 
-    def __init__(self, messages_filename:str, categories_filename:str, dbname : str):
+    def __init__(self, messages_filename:str, categories_filename:str, dbname : str, tablename:str):
         """inits ETLPipeline
 
         Parameters
@@ -46,6 +46,7 @@ class ETLPipeline ():
         self.messages_filename      = messages_filename
         self.categories_filename    = categories_filename
         self.dbname                 = dbname
+        self.tablename              = tablename
 
         self.df_messages    = None
         self.df_categories  = None
@@ -170,7 +171,7 @@ class ETLPipeline ():
         """
         db_name = f'sqlite:///{self.dbname}'
         engine = sql.create_engine(db_name)
-        tbl_name = 'DisasterMessages'
+        tbl_name = self.tablename
         self.df_merged.to_sql(tbl_name, engine, index=False, if_exists='replace')
 
         msg = f'stored merged dataframe in sqlite DB: {self.dbname} - Tablename: {tbl_name}'
@@ -196,6 +197,17 @@ class ETLPipeline ():
     #
     #   Properites
     #
+    @property
+    def tablename(self):
+        """property getter for tablename"""
+        return self._tablename
+
+    @tablename.setter
+    def tablename(self, value):
+        """property setter for tablename"""
+        self._tablename = value
+
+
     @property
     def dbname(self):
         """property getter for dbname"""
@@ -271,7 +283,7 @@ class ETLPipeline ():
 
 
 
-def run_etl_pipeline (messages_filename:str, categories_filename:str, dbname:str, is_print_report:bool=False):
+def run_etl_pipeline (messages_filename:str, categories_filename:str, dbname:str, tablename:str='DisasterMessages', is_print_report:bool=False):
     """run the ETL pipeline process
 
     Parameters
@@ -293,7 +305,7 @@ def run_etl_pipeline (messages_filename:str, categories_filename:str, dbname:str
                    'messages_filename':messages_filename, 
                    'categories_filename':categories_filename})
 
-    etl_pipeline = ETLPipeline(messages_filename, categories_filename, dbname)
+    etl_pipeline = ETLPipeline(messages_filename, categories_filename, dbname, tablename)
     etl_pipeline.run_etl_pipeline()
 
     if is_print_report:

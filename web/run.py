@@ -1,5 +1,6 @@
 import json
 import logging
+from sys import argv
 import plotly
 import pandas as pd
 
@@ -48,17 +49,20 @@ def tokenize(text):
 
     return clean_tokens
 
-def load_data():    
-    # load data
-    engine = create_engine('sqlite:///data/DisasterResponse.db')
-    df = pd.read_sql_table('DisasterMessages', engine)
+def load_data(db_file_name:str='data/DisasterResponse.db', 
+              db_table_name:str='DisasterMessages', 
+              model_file_name:str='./models/disaster_response_model.joblib'):        
+    
+    print(f'\nloading data...\n DB: {db_file_name},\n TABLE: {db_table_name},\n MODEL:{model_file_name}\n')
+    # load data    
+    engine = create_engine(f'sqlite:///{db_file_name}')
+    df = pd.read_sql_table(db_table_name, engine)
 
     # load model
-    model = DisasterResponseModel()
-    model = model.load_model("./models/disaster_response_model_sverb.joblib")    
-    #model = joblib.load("../models/disaster_response_model.joblib")
-
-    return model, df
+    l_model = DisasterResponseModel()
+    l_model = l_model.load_model(model_file_name)
+    
+    return l_model, df
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -144,13 +148,13 @@ def go():
     )
 
 
-def main():
+def main(db_file_name:str, db_table_name:str, model_file_name:str, port:int=3002, debug=True):
     global model 
     global df
-    model, df = load_data()
+    model, df = load_data(db_file_name=db_file_name, db_table_name=db_table_name, model_file_name=model_file_name)
 
-    app.run(host='0.0.0.0', port=3002, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=debug)
 
 
-if __name__ == '__main__':
-    main()
+if __name__ == '__main__':    
+    main(db_file_name= argv[1], db_table_name= argv[2], model_file_name=argv[2])
